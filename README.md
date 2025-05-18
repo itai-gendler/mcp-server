@@ -1,132 +1,63 @@
-# OpenAPI to MCP Converter
+# MCP server for OpenAPI schemas
 
-Converts OpenAPI schemas (2.0, 3.0, 3.1) to MCP tools and Zod schemas. Supports security policies for API authentication.
+A Model Context Protocol (MCP) server that converts OpenAPI schemas (3.0, 3.1) to MCP tools. This server allows AI assistants to interact with your APIs through the MCP protocol.
 
-## Install
+## Prerequisites
 
-```bash
-npm install
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create an `openapi` folder in the root directory and place your OpenAPI YAML files inside:
+   ```bash
+   mkdir -p openapi
+   # Copy example files from the examples folder
+   cp examples/*.yaml openapi/
+   ```
+   
+   You can add multiple OpenAPI YAML files to the `openapi` folder. The server will automatically load and convert all YAML files in this directory, making all APIs available through a single MCP server instance.
+
+3. Security Configuration:
+   - Currently, only API key authentication is supported
+   - You'll need to set environment variables according to the header names defined in your OpenAPI schemas
+   - For example, if your security scheme uses a header named `API_KEY`, you'll need to set an environment variable with the same name
+
+## Configuration for Windsurf
+
+To use this MCP server with Windsurf, add the following configuration to your MCP config file:
+
+```json
+"openapi": {
+  "command": "node",
+  "args": ["path/to/mcp-server/index.js", "stdio"],
+  "env": {
+    "API_KEY": "your-api-key-value"
+  }
+}
 ```
 
-## Usage
+Make sure to:
+- Replace `path/to/mcp-server` with the actual path to this repository on your system
+- Add any required environment variables based on your API's security requirements
 
-```javascript
-// Load from a single file
-const converter = new OpenApiToMcp();
-await converter.loadFromFile("openapi.yaml");
+## Development Setup
 
-// Load from a directory (loads all .yaml and .yml files)
-await converter.loadFromDirectory("openapi");
+1. Run the server in SSE mode:
+   ```bash
+   npm run start:sse
+   ```
 
-// Load from URL
-await converter.loadFromUrl("https://example.com/api/openapi.yaml");
+2. Run the MCP Inspector:
+   ```bash
+   npx @modelcontextprotocol/inspector node
+   ```
 
-// Generate MCP tools
-await converter.generateMcpServerTools(mcpServer);
-```
+3. In the MCP Inspector:
+   - Choose transport type: `SSE`
+   - Enter URL: `http://localhost:3000/sse`
+   - Press `Connect`
 
-## Security Policies
-
-The converter supports extracting security policies from OpenAPI schemas and applying them to API requests. Currently, it supports `apiKey` type security schemes that are injected into request headers.
-
-### OpenAPI Security Configuration
-
-Define security schemes in your OpenAPI schema:
-
-```yaml
-components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
-    BearerAuth:
-      type: http
-      scheme: bearer
-
-# Global security policy - applies to all operations unless overridden
-security:
-  - ApiKeyAuth: []
-
-paths:
-  /api/resource:
-    get:
-      # This operation uses the global security policy
-      ...
-    post:
-      # This operation overrides the global security policy
-      security:
-        - BearerAuth: []
-      ...
-```
-
-### Environment Variables
-
-Security tokens are automatically loaded from environment variables. The environment variable names are derived from the header names specified in the OpenAPI schema:
-
-- Header `X-API-Key` → Environment variable `X_API_KEY`
-- Header `Authorization` → Environment variable `AUTHORIZATION`
-
-Example:
-
-```bash
-# Set environment variables for security tokens
-export X_API_KEY=your-api-key
-export AUTHORIZATION="Bearer your-token"
-```
-
-## Run
-
-You can run the MCP server in three different modes:
-
-### Standard Mode (stdio)
-
-Run the MCP server using stdio transport:
-
-```bash
-npm start        # Run server using stdio (default)
-# or
-npm run start:stdio  # Same as above
-```
-
-### Streamable HTTP Mode
-
-Run the MCP server using streamable HTTP transport:
-
-```bash
-npm run start:http  # Run server using HTTP
-```
-
-This will start an HTTP server on port 3000 (by default) with the following endpoints:
-
-- `http://localhost:3000/health` - Health check endpoint
-- `http://localhost:3000/mcp` - MCP endpoint for tool invocations
-
-The streamable HTTP implementation uses a stateless approach, creating a new MCP server instance for each request. This ensures complete isolation between requests but may have higher latency for multiple requests.
-
-### Server-Sent Events (SSE) Mode
-
-Run the MCP server using Server-Sent Events (SSE) transport:
-
-```bash
-npm run start:sse  # Run server using SSE
-```
-
-This will start an HTTP server on port 3000 (by default) with the following endpoints:
-
-- `http://localhost:3000/health` - Health check endpoint
-- `http://localhost:3000/sse` - SSE endpoint for establishing the event stream connection
-- `http://localhost:3000/messages` - Endpoint for sending messages to the server (requires sessionId parameter)
-
-### Customizing Server Settings
-
-You can customize the port and host for both HTTP modes by setting environment variables:
-
-```bash
-PORT=8080 HOST=0.0.0.0 npm run start:http  # For streamable HTTP
-# or
-PORT=8080 HOST=0.0.0.0 npm run start:sse   # For SSE
-```
 
 ## License
 
