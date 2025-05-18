@@ -14,11 +14,11 @@ const server = new McpServer({
 // Load and convert OpenAPI schema to MCP tools
 async function loadOpenApiTools() {
   try {
-    // Option 1: Load from a local file (default)
-    const openApiFilePath = path.resolve(__dirname, "../../openapi.yaml");
+    // Load from the openapi directory
+    const openApiDirPath = path.resolve(__dirname, "../../openapi");
     const converter = new OpenApiToMcp();
 
-    await converter.loadFromFile(openApiFilePath);
+    await converter.loadFromDirectory(openApiDirPath);
 
     // Configure API client options
     const apiOptions = {
@@ -39,16 +39,16 @@ async function loadOpenApiTools() {
     await converter.generateMcpServerTools(server, apiOptions);
 
     console.log(
-      "Successfully loaded OpenAPI schema from file and generated MCP tools with API client functionality"
+      "Successfully loaded OpenAPI schemas from directory and generated MCP tools with API client functionality"
     );
 
-    // Option 2: Load from a URL (commented out - uncomment to use)
+    // Option 2: Load from a single file (commented out - uncomment to use)
     /*
-    // Example URL - replace with your actual OpenAPI URL
-    const openApiUrl = 'https://example.com/api/openapi.yaml';
-    const urlConverter = new OpenApiToMcp();
+    // Example file path - replace with your actual OpenAPI file path
+    const openApiFilePath = path.resolve(__dirname, "../../openapi.yaml");
+    const fileConverter = new OpenApiToMcp();
     
-    await urlConverter.loadFromUrl(openApiUrl);
+    await fileConverter.loadFromFile(openApiFilePath);
     await urlConverter.generateMcpServerTools(server, apiOptions);
     
     console.log("Successfully loaded OpenAPI schema from URL and generated MCP tools");

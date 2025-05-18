@@ -11,9 +11,12 @@ npm install
 ## Usage
 
 ```javascript
-// Load from file
+// Load from a single file
 const converter = new OpenApiToMcp();
 await converter.loadFromFile("openapi.yaml");
+
+// Load from a directory (loads all .yaml and .yml files)
+await converter.loadFromDirectory("openapi");
 
 // Load from URL
 await converter.loadFromUrl("https://example.com/api/openapi.yaml");

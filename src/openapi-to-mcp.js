@@ -1,7 +1,8 @@
-const { loadOpenApiFromFile, loadOpenApiFromUrl } = require('./utils/openapi-loader');
+const { loadOpenApiFromFile, loadOpenApiFromUrl, loadOpenApiFromDirectory } = require('./utils/openapi-loader');
 const ConverterFactory = require('./converters/converter-factory');
 const McpToolGenerator = require('./mcp-tools/tool-generator');
 const SchemaUrlExtractor = require('./schema-loader/schema-url-extractor');
+const path = require('path');
 
 /**
  * Main class for converting OpenAPI schemas to MCP tools
@@ -14,7 +15,9 @@ class OpenApiToMcp {
   constructor(options = {}) {
     this.options = options;
     this.schema = null;
+    this.schemas = [];
     this.converter = null;
+    this.converters = [];
   }
 
   /**
@@ -25,6 +28,19 @@ class OpenApiToMcp {
   async loadFromFile(filePath) {
     this.schema = await loadOpenApiFromFile(filePath);
     this.converter = ConverterFactory.createConverter(this.schema);
+    return this;
+  }
+
+  /**
+   * Load OpenAPI schemas from a directory
+   * @param {string} dirPath - Path to the directory containing OpenAPI schema files
+   * @returns {Promise<OpenApiToMcp>} This instance for chaining
+   */
+  async loadFromDirectory(dirPath) {
+    this.schemas = await loadOpenApiFromDirectory(dirPath);
+    this.converters = this.schemas.map(({ schema }) => (
+      ConverterFactory.createConverter(schema)
+    ));
     return this;
   }
 
@@ -73,37 +89,76 @@ class OpenApiToMcp {
   }
 
   /**
-   * Generate MCP server tools from the loaded OpenAPI schema
+   * Get the base URL from the loaded schema
+   * @returns {string|null} Base URL or null if not found
+   */
+  getBaseUrlFromSchema() {
+    if (this.schema) {
+      return SchemaUrlExtractor.getBaseUrl(this.schema);
+    }
+    return null;
+  }
+
+  /**
+   * Generate MCP tools for a server
    * @param {McpServer} server - MCP server instance
-   * @param {object} options - Options for the API calls
-   * @param {string} options.baseUrl - Base URL for the API calls (overrides the server URL from the schema)
-   * @param {object} options.headers - Default headers to include in all requests
-   * @param {number} options.timeout - Request timeout in milliseconds
+   * @param {object} apiOptions - API client options
    * @returns {Promise<void>}
    */
-  async generateMcpServerTools(server, options = {}) {
-    if (!this.converter) {
-      throw new Error('No OpenAPI schema loaded. Call loadFromFile() or loadFromObject() first.');
+  async generateMcpServerTools(server, apiOptions = {}) {
+    if (!this.schema && this.schemas.length === 0) {
+      throw new Error('No OpenAPI schema loaded. Call loadFromFile, loadFromUrl, loadFromDirectory, or loadFromObject first.');
     }
 
-    const tools = this.convertToMcpTools();
-    
-    // Get the base URL from options or from the schema
-    const baseUrl = options.baseUrl || this.getBaseUrlFromSchema();
-    if (!baseUrl) {
-      console.warn('No base URL provided and none found in schema. API calls will likely fail.');
+    // If we have multiple schemas from a directory
+    if (this.schemas.length > 0) {
+      for (let i = 0; i < this.schemas.length; i++) {
+        const { schema, filePath } = this.schemas[i];
+        const converter = this.converters[i];
+        
+        // Clone apiOptions to avoid modifying the original
+        const schemaApiOptions = { ...apiOptions };
+        
+        // Extract base URL from schema if not provided in options
+        if (!schemaApiOptions.baseUrl) {
+          // Temporarily set this.schema to the current schema to use getBaseUrlFromSchema
+          const originalSchema = this.schema;
+          this.schema = schema;
+          const baseUrl = this.getBaseUrlFromSchema();
+          // Restore the original schema
+          this.schema = originalSchema;
+          
+          if (baseUrl) {
+            schemaApiOptions.baseUrl = baseUrl;
+          }
+        }
+
+        // Convert schema to MCP tools
+        const tools = converter.convertToMcpTools();
+        
+        // Generate tools with API client functionality
+        const generator = new McpToolGenerator();
+        generator.generateTools(server, tools, schemaApiOptions);
+        
+        console.log(`Successfully loaded and registered tools from: ${path.basename(filePath)}`);
+      }
+      return;
     }
-    
-    // Configure API options
-    const apiOptions = {
-      baseUrl,
-      headers: options.headers || {},
-      timeout: options.timeout || 30000
-    };
-    
-    // Generate MCP tools
-    const toolGenerator = new McpToolGenerator();
-    toolGenerator.generateTools(server, tools, apiOptions);
+
+    // Extract base URL from schema if not provided in options
+    if (!apiOptions.baseUrl) {
+      const baseUrl = this.getBaseUrlFromSchema();
+      if (baseUrl) {
+        apiOptions.baseUrl = baseUrl;
+      }
+    }
+
+    // Convert schema to MCP tools
+    const tools = this.convertToMcpTools();
+
+    // Generate tools with API client functionality
+    const generator = new McpToolGenerator();
+    generator.generateTools(server, tools, apiOptions);
   }
   
   /**

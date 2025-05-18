@@ -100,8 +100,59 @@ function detectOpenApiVersion(schema) {
   }
 }
 
+/**
+ * Load OpenAPI schemas from a directory
+ * @param {string} dirPath - Path to the directory containing OpenAPI schema files
+ * @returns {Promise<Array<object>>} - Array of parsed OpenAPI schemas
+ */
+async function loadOpenApiFromDirectory(dirPath) {
+  try {
+    const fullPath = path.resolve(dirPath);
+    
+    // Check if the directory exists
+    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+      throw new Error(`Directory does not exist or is not a directory: ${fullPath}`);
+    }
+    
+    // Get all YAML files in the directory
+    const files = fs.readdirSync(fullPath)
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        return ext === '.yaml' || ext === '.yml';
+      })
+      .map(file => path.join(fullPath, file));
+    
+    if (files.length === 0) {
+      throw new Error(`No YAML files found in directory: ${fullPath}`);
+    }
+    
+    // Load each file and parse it
+    const schemas = [];
+    for (const file of files) {
+      try {
+        const schema = await loadOpenApiFromFile(file);
+        schemas.push({
+          filePath: file,
+          schema
+        });
+      } catch (error) {
+        console.warn(`Failed to load schema from ${file}: ${error.message}`);
+      }
+    }
+    
+    if (schemas.length === 0) {
+      throw new Error(`No valid OpenAPI schemas found in directory: ${fullPath}`);
+    }
+    
+    return schemas;
+  } catch (error) {
+    throw new Error(`Failed to load OpenAPI schemas from directory: ${error.message}`);
+  }
+}
+
 module.exports = {
   loadOpenApiFromFile,
   loadOpenApiFromUrl,
+  loadOpenApiFromDirectory,
   detectOpenApiVersion
 };

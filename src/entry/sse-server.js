@@ -12,8 +12,8 @@ async function createConfiguredMcpServer() {
       version: "1.0.0",
     });
     
-    // Load OpenAPI schema
-    const openApiFilePath = path.resolve(__dirname, "../../openapi.yaml");
+    // Load OpenAPI schemas from directory
+    const openApiDirPath = path.resolve(__dirname, "../../openapi");
     const converter = new OpenApiToMcp();
     
     // Configure API client options
@@ -31,9 +31,11 @@ async function createConfiguredMcpServer() {
       timeout: 10000
     };
     
-    // Load schema and register tools BEFORE returning the server
-    await converter.loadFromFile(openApiFilePath);
+    // Load schemas and register tools BEFORE returning the server
+    await converter.loadFromDirectory(openApiDirPath);
     await converter.generateMcpServerTools(server, apiOptions);
+    
+    console.log("Successfully loaded OpenAPI schemas from directory and generated MCP tools");
     
     return server;
   } catch (error) {

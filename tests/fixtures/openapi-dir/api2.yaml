@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Test API 2
+  version: 1.0.0
+  description: Test API 2 for directory loading tests
+servers:
+  - url: http://api2.example.com
+    description: API 2 Server
+paths:
+  /api2/resource:
+    get:
+      summary: Get API 2 Resource
+      operationId: getApi2Resource
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string

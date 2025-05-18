@@ -1,10 +1,12 @@
 const path = require('path');
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const OpenApiToMcp = require('../src/openapi-to-mcp');
+const SchemaUrlExtractor = require('../src/schema-loader/schema-url-extractor');
 
 describe('OpenApiToMcp', () => {
   let converter;
   const openApiFilePath = path.resolve(__dirname, '../openapi.yaml');
+  const openApiDirPath = path.resolve(__dirname, './fixtures/openapi-dir');
 
   beforeEach(() => {
     converter = new OpenApiToMcp();
@@ -19,6 +21,34 @@ describe('OpenApiToMcp', () => {
 
     test('should throw error for invalid file path', async () => {
       await expect(converter.loadFromFile('invalid-path.yaml')).rejects.toThrow();
+    });
+  });
+
+  describe('loadFromDirectory', () => {
+    test('should load OpenAPI schemas from directory', async () => {
+      await converter.loadFromDirectory(openApiDirPath);
+      
+      expect(converter.schemas).toBeDefined();
+      expect(Array.isArray(converter.schemas)).toBe(true);
+      expect(converter.schemas.length).toBe(2); // We have two test files
+      
+      expect(converter.converters).toBeDefined();
+      expect(Array.isArray(converter.converters)).toBe(true);
+      expect(converter.converters.length).toBe(2);
+      
+      // Check that each schema has the expected structure
+      converter.schemas.forEach(item => {
+        expect(item).toHaveProperty('filePath');
+        expect(item).toHaveProperty('schema');
+        expect(item.schema).toHaveProperty('openapi', '3.0.0');
+        expect(item.schema).toHaveProperty('info');
+        expect(item.schema.info).toHaveProperty('title');
+        expect(['Test API 1', 'Test API 2']).toContain(item.schema.info.title);
+      });
+    });
+
+    test('should throw error for invalid directory path', async () => {
+      await expect(converter.loadFromDirectory('./non-existent-dir')).rejects.toThrow();
     });
   });
 
@@ -61,12 +91,12 @@ describe('OpenApiToMcp', () => {
   });
 
   describe('generateMcpServerTools', () => {
-    test('should register tools with MCP server', async () => {
+    test('should register tools with MCP server for single schema', async () => {
       // Create a mock MCP server
       const server = {
         tool: jest.fn()
       };
-
+      
       await converter.loadFromFile(openApiFilePath);
       await converter.generateMcpServerTools(server, {
         baseUrl: 'http://test-api.example.com'
@@ -75,6 +105,20 @@ describe('OpenApiToMcp', () => {
       // Verify that tool was called for each API endpoint
       expect(server.tool).toHaveBeenCalled();
       expect(server.tool.mock.calls.length).toBeGreaterThan(0);
+    });
+    
+    test('should register tools with MCP server for multiple schemas', async () => {
+      // Create a mock MCP server
+      const server = {
+        tool: jest.fn()
+      };
+      
+      await converter.loadFromDirectory(openApiDirPath);
+      await converter.generateMcpServerTools(server);
+      
+      // Verify that tool was called for each API endpoint from both schemas
+      expect(server.tool).toHaveBeenCalled();
+      expect(server.tool.mock.calls.length).toBeGreaterThan(1); // Should have at least 2 calls (one for each API)
     });
     
     test('should use base URL from schema if not provided in options', async () => {
@@ -93,6 +137,25 @@ describe('OpenApiToMcp', () => {
       expect(spy).toHaveBeenCalled();
       
       // Restore the original method
+      spy.mockRestore();
+    });
+
+    test('should extract base URLs from schemas', async () => {
+      // Create a spy on SchemaUrlExtractor.getBaseUrl
+      const spy = jest.spyOn(SchemaUrlExtractor, 'getBaseUrl');
+      
+      // Create a mock MCP server
+      const server = {
+        tool: jest.fn()
+      };
+      
+      await converter.loadFromDirectory(openApiDirPath);
+      await converter.generateMcpServerTools(server);
+      
+      // Should have called getBaseUrl at least twice (once for each schema)
+      expect(spy).toHaveBeenCalledTimes(2);
+      
+      // Restore the spy
       spy.mockRestore();
     });
 

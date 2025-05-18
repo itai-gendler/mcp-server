@@ -3,3 +3,4 @@ coverage/
 .vscode/
 openapi.yaml
 tools.json
+openapi
