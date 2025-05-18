@@ -1,5 +1,8 @@
 const express = require('express');
+const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
 const { SSEServerTransport } = require('@modelcontextprotocol/sdk/server/sse.js');
+const debug = require('debug')('mcp-server:openapi');
 
 /**
  * Creates an HTTP server for the MCP server using Server-Sent Events (SSE)
@@ -92,6 +95,8 @@ class SseHttpServer {
         }
         
         // Handle the message using the associated transport
+        
+        debug('Received message body:', JSON.stringify(req.body, null, 2));
         await transport.handlePostMessage(req, res, req.body);
       } catch (error) {
         console.error('Error handling message:', error);

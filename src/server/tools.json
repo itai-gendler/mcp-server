@@ -5,16 +5,17 @@
     "tools": [
       {
         "name": "get_api_config_activated",
+        "description": "Get the active Config configuration",
         "inputSchema": {
           "type": "object",
           "properties": {},
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get the active Config configuration" }
+        }
       },
       {
         "name": "put_api_config_activated",
+        "description": "Update the active Config configuration",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -175,33 +176,31 @@
           },
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Update the active Config configuration" }
+        }
       },
       {
         "name": "delete_api_config_activated",
+        "description": "Reset the active Config configuration to defaults",
         "inputSchema": {
           "type": "object",
           "properties": {},
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": {
-          "title": "Reset the active Config configuration to defaults"
         }
       },
       {
         "name": "get_api_queue",
+        "description": "Get all Queues",
         "inputSchema": {
           "type": "object",
           "properties": {},
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get all Queues" }
+        }
       },
       {
         "name": "post_api_queue",
+        "description": "Create a new Queue",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -225,22 +224,22 @@
           },
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Create a new Queue" }
+        }
       },
       {
         "name": "get_api_queue_ByidOrName",
+        "description": "Get Queue by ID or Name",
         "inputSchema": {
           "type": "object",
           "properties": { "idOrName": { "type": "string" } },
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get Queue by ID or Name" }
+        }
       },
       {
         "name": "put_api_queue_ByidOrName",
+        "description": "Update an Queue",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -266,22 +265,22 @@
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Update an Queue" }
+        }
       },
       {
         "name": "delete_api_queue_ByidOrName",
+        "description": "Delete an Queue",
         "inputSchema": {
           "type": "object",
           "properties": { "idOrName": { "type": "string" } },
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Delete an Queue" }
+        }
       },
       {
         "name": "post_api_queue_purge",
+        "description": "Delete Queue items older than the specified date",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -300,33 +299,31 @@
           },
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": {
-          "title": "Delete Queue items older than the specified date"
         }
       },
       {
         "name": "get_api_queue_active",
+        "description": "Get all active Queues",
         "inputSchema": {
           "type": "object",
           "properties": {},
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get all active Queues" }
+        }
       },
       {
         "name": "get_api_person",
+        "description": "Get all Persons",
         "inputSchema": {
           "type": "object",
           "properties": {},
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get all Persons" }
+        }
       },
       {
         "name": "post_api_person",
+        "description": "Create a new Person",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -357,22 +354,22 @@
           },
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Create a new Person" }
+        }
       },
       {
         "name": "get_api_person_ByidOrName",
+        "description": "Get Person by ID or Name",
         "inputSchema": {
           "type": "object",
           "properties": { "idOrName": { "type": "string" } },
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Get Person by ID or Name" }
+        }
       },
       {
         "name": "put_api_person_ByidOrName",
+        "description": "Update an Person",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -405,22 +402,22 @@
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Update an Person" }
+        }
       },
       {
         "name": "delete_api_person_ByidOrName",
+        "description": "Delete an Person",
         "inputSchema": {
           "type": "object",
           "properties": { "idOrName": { "type": "string" } },
           "required": ["idOrName"],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": { "title": "Delete an Person" }
+        }
       },
       {
         "name": "post_api_person_purge",
+        "description": "Delete Person items older than the specified date",
         "inputSchema": {
           "type": "object",
           "properties": {
@@ -439,9 +436,6 @@
           },
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "annotations": {
-          "title": "Delete Person items older than the specified date"
         }
       }
     ]
