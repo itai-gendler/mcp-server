@@ -49,7 +49,18 @@ class BaseOpenApiConverter {
     
     // Generate a name from the path and method
     const pathParts = path.split('/').filter(part => part.length > 0);
-    const cleanPath = pathParts.map(part => {
+    
+    // Remove common prefixes
+    const commonPrefixes = ['api']; // List of common prefixes to remove
+    let startIndex = 0;
+    
+    // Check if the first part of the path is a common prefix
+    if (pathParts.length > 0 && commonPrefixes.includes(pathParts[0].toLowerCase())) {
+      startIndex = 1; // Skip the first part
+    }
+    
+    // Process the remaining path parts
+    const cleanPath = pathParts.slice(startIndex).map(part => {
       // Replace path parameters with their names
       if (part.startsWith('{') && part.endsWith('}')) {
         return `By${part.substring(1, part.length - 1)}`;
@@ -57,7 +68,10 @@ class BaseOpenApiConverter {
       return part;
     }).join('_');
     
-    return `${method.toLowerCase()}_${cleanPath}`;
+    // If after removing prefixes we have an empty path, use a default name
+    const finalPath = cleanPath || 'root';
+    
+    return `${method.toLowerCase()}_${finalPath}`;
   }
 
   /**
