@@ -1,7 +1,7 @@
 const path = require('path');
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
-const OpenApiToMcp = require('./src/openapi-to-mcp');
-const StreamableHttpServer = require('./src/server/streamable-http-server');
+const OpenApiToMcp = require('../../src/openapi-to-mcp');
+const StreamableHttpServer = require('../../src/server/streamable-http-server');
 
 // Load OpenAPI schema and create a configured MCP server
 async function createConfiguredMcpServer() {
@@ -13,7 +13,7 @@ async function createConfiguredMcpServer() {
     });
     
     // Load OpenAPI schema
-    const openApiFilePath = path.resolve(__dirname, "openapi.yaml");
+    const openApiFilePath = path.resolve(__dirname, "../../openapi.yaml");
     const converter = new OpenApiToMcp();
     
     // Configure API client options

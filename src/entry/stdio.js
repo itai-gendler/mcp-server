@@ -3,7 +3,7 @@ const {
   StdioServerTransport,
 } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const path = require("path");
-const OpenApiToMcp = require("./src/openapi-to-mcp");
+const OpenApiToMcp = require("../../src/openapi-to-mcp");
 
 // Create an MCP server
 const server = new McpServer({
@@ -15,7 +15,7 @@ const server = new McpServer({
 async function loadOpenApiTools() {
   try {
     // Option 1: Load from a local file (default)
-    const openApiFilePath = path.resolve(__dirname, "openapi.yaml");
+    const openApiFilePath = path.resolve(__dirname, "../../openapi.yaml");
     const converter = new OpenApiToMcp();
 
     await converter.loadFromFile(openApiFilePath);

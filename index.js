@@ -42,11 +42,11 @@ function getTransportType() {
 function getServerScript(transportType) {
   switch (transportType) {
     case 'stdio':
-      return path.resolve(__dirname, 'stdio.js');
+      return path.resolve(__dirname, 'src/entry/stdio.js');
     case 'sse':
-      return path.resolve(__dirname, 'sse-server.js');
+      return path.resolve(__dirname, 'src/entry/sse-server.js');
     case 'streamable':
-      return path.resolve(__dirname, 'http-server.js');
+      return path.resolve(__dirname, 'src/entry/http-server.js');
     default:
       // This should never happen due to validation in getTransportType
       console.error(`Error: Unsupported transport type: ${transportType}`);
