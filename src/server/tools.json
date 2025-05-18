@@ -1,0 +1,449 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "get_api_config_activated",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get the active Config configuration" }
+      },
+      {
+        "name": "put_api_config_activated",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "openapi": {
+                      "type": "object",
+                      "properties": {
+                        "title": { "type": "string" },
+                        "description": { "type": "string" },
+                        "contactName": { "type": "string" },
+                        "contactUrl": { "type": "string" },
+                        "contactEmail": { "type": "string" },
+                        "licenseName": { "type": "string" },
+                        "licenseUrl": { "type": "string" },
+                        "serverUrl": { "type": "string" },
+                        "serverDescription": { "type": "string" }
+                      },
+                      "additionalProperties": false
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": { "port": { "type": "number" } },
+                      "additionalProperties": false
+                    },
+                    "mongo": {
+                      "type": "object",
+                      "properties": {
+                        "uri": { "type": "string" },
+                        "options": {
+                          "type": "object",
+                          "properties": {},
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "httpLogger": {
+                      "type": "object",
+                      "properties": {},
+                      "additionalProperties": false
+                    },
+                    "errorMiddleware": {
+                      "type": "object",
+                      "properties": {
+                        "printStackTrace": { "type": "boolean" }
+                      },
+                      "additionalProperties": false
+                    },
+                    "logger": {
+                      "type": "object",
+                      "properties": {
+                        "level": { "type": "string" },
+                        "transport": {
+                          "type": "object",
+                          "properties": {
+                            "target": { "type": "string" },
+                            "options": {
+                              "type": "object",
+                              "properties": {
+                                "colorize": { "type": "boolean" },
+                                "ignore": { "type": "string" },
+                                "timestampKey": { "type": "string" },
+                                "singleLine": { "type": "boolean" }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "swaggerUi": {
+                      "type": "object",
+                      "properties": {
+                        "explorer": { "type": "boolean" },
+                        "swaggerOptions": {
+                          "type": "object",
+                          "properties": {
+                            "tryItOutEnabled": { "type": "boolean" },
+                            "layout": { "type": "string" }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "openApiValidator": {
+                      "type": "object",
+                      "properties": {
+                        "apiSpec": { "type": "string" },
+                        "ignoreUndocumented": { "type": "boolean" },
+                        "validateRequests": { "type": "boolean" }
+                      },
+                      "additionalProperties": false
+                    },
+                    "auth": {
+                      "type": "object",
+                      "properties": {
+                        "session": {
+                          "type": "object",
+                          "properties": {
+                            "options": {
+                              "type": "object",
+                              "properties": {
+                                "secret": { "type": "string" },
+                                "resave": { "type": "boolean" },
+                                "saveUninitialized": { "type": "boolean" }
+                              },
+                              "additionalProperties": false
+                            },
+                            "storage": { "type": "string" }
+                          },
+                          "additionalProperties": false
+                        },
+                        "providers": {
+                          "type": "object",
+                          "properties": {
+                            "google": {
+                              "type": "object",
+                              "properties": {
+                                "clientID": { "type": "string" },
+                                "clientSecret": { "type": "string" },
+                                "callbackURL": { "type": "string" },
+                                "scope": {
+                                  "type": "array",
+                                  "items": {
+                                    "anyOf": [
+                                      { "not": {} },
+                                      { "type": "string" }
+                                    ]
+                                  }
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "redirectUrl": { "type": "string" }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["name", "config"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Update the active Config configuration" }
+      },
+      {
+        "name": "delete_api_config_activated",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": {
+          "title": "Reset the active Config configuration to defaults"
+        }
+      },
+      {
+        "name": "get_api_queue",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get all Queues" }
+      },
+      {
+        "name": "post_api_queue",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "data": { "type": "string" },
+                "details": {
+                  "type": "object",
+                  "properties": { "first_name": { "type": "string" } },
+                  "additionalProperties": false
+                },
+                "status": { "type": "string" },
+                "priority": { "type": "number" }
+              },
+              "required": ["name", "status"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Create a new Queue" }
+      },
+      {
+        "name": "get_api_queue_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": { "idOrName": { "type": "string" } },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get Queue by ID or Name" }
+      },
+      {
+        "name": "put_api_queue_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "idOrName": { "type": "string" },
+            "body": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "data": { "type": "string" },
+                "details": {
+                  "type": "object",
+                  "properties": { "first_name": { "type": "string" } },
+                  "additionalProperties": false
+                },
+                "status": { "type": "string" },
+                "priority": { "type": "number" }
+              },
+              "required": ["name", "status"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Update an Queue" }
+      },
+      {
+        "name": "delete_api_queue_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": { "idOrName": { "type": "string" } },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Delete an Queue" }
+      },
+      {
+        "name": "post_api_queue_purge",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string",
+                  "enum": ["seconds", "minutes", "hours", "days"]
+                },
+                "value": { "type": "number", "minimum": 1 }
+              },
+              "required": ["unit", "value"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": {
+          "title": "Delete Queue items older than the specified date"
+        }
+      },
+      {
+        "name": "get_api_queue_active",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get all active Queues" }
+      },
+      {
+        "name": "get_api_person",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get all Persons" }
+      },
+      {
+        "name": "post_api_person",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "first_name": { "type": "string" },
+                    "address": {
+                      "type": "object",
+                      "properties": {
+                        "city": { "type": "string" },
+                        "zip": { "type": "string" }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["name", "details"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Create a new Person" }
+      },
+      {
+        "name": "get_api_person_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": { "idOrName": { "type": "string" } },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Get Person by ID or Name" }
+      },
+      {
+        "name": "put_api_person_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "idOrName": { "type": "string" },
+            "body": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "first_name": { "type": "string" },
+                    "address": {
+                      "type": "object",
+                      "properties": {
+                        "city": { "type": "string" },
+                        "zip": { "type": "string" }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["name", "details"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Update an Person" }
+      },
+      {
+        "name": "delete_api_person_ByidOrName",
+        "inputSchema": {
+          "type": "object",
+          "properties": { "idOrName": { "type": "string" } },
+          "required": ["idOrName"],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": { "title": "Delete an Person" }
+      },
+      {
+        "name": "post_api_person_purge",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string",
+                  "enum": ["seconds", "minutes", "hours", "days"]
+                },
+                "value": { "type": "number", "minimum": 1 }
+              },
+              "required": ["unit", "value"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": {
+          "title": "Delete Person items older than the specified date"
+        }
+      }
+    ]
+  }
+}

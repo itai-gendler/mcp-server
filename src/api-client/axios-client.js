@@ -101,8 +101,21 @@ class AxiosApiClient {
     const queryParams = {};
     const bodyParams = {};
     
+    // Handle the case where the LLM wraps the body with another body
+    // (e.g., { body: { actual: "payload" } } instead of just { actual: "payload" })
+    let processedParams = { ...params };
+    
+    // Check if there's a single 'body' parameter for POST/PUT/PATCH methods
+    if (['post', 'put', 'patch'].includes(method.toLowerCase()) && 
+        Object.keys(processedParams).length === 1 && 
+        processedParams.body && 
+        typeof processedParams.body === 'object') {
+      console.log('Detected wrapped body parameter, unwrapping it');
+      processedParams = processedParams.body;
+    }
+    
     // Process parameters based on their location (path, query, body)
-    Object.entries(params).forEach(([key, value]) => {
+    Object.entries(processedParams).forEach(([key, value]) => {
       // Check if this is a path parameter
       if (path.includes(`{${key}}`)) {
         pathParams[key] = value;

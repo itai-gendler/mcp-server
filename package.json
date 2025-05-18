@@ -7,6 +7,7 @@
     "start": "node index.js",
     "start:stdio": "node index.js",
     "start:http": "node http-server.js",
+    "start:sse": "node sse-server.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },

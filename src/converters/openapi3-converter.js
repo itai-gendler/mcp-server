@@ -1,5 +1,5 @@
-const { z } = require('zod');
-const BaseOpenApiConverter = require('./base-converter');
+const { z } = require("zod");
+const BaseOpenApiConverter = require("./base-converter");
 
 /**
  * Converter for OpenAPI 3.0 schemas
@@ -16,7 +16,17 @@ class OpenApi3Converter extends BaseOpenApiConverter {
     for (const [path, pathItem] of Object.entries(paths)) {
       for (const [method, operation] of Object.entries(pathItem)) {
         // Skip if not an HTTP method
-        if (!['get', 'post', 'put', 'delete', 'patch', 'options', 'head'].includes(method)) {
+        if (
+          ![
+            "get",
+            "post",
+            "put",
+            "delete",
+            "patch",
+            "options",
+            "head",
+          ].includes(method)
+        ) {
           continue;
         }
 
@@ -28,9 +38,11 @@ class OpenApi3Converter extends BaseOpenApiConverter {
         tools.push({
           name: toolName,
           description: toolDescription,
+          summary: operation.summary,
+          title: operation["x-title"] || operation.summary,
           parameters: zodSchema,
           method,
-          path
+          path,
         });
       }
     }
@@ -48,26 +60,31 @@ class OpenApi3Converter extends BaseOpenApiConverter {
     const parameters = [];
 
     // Path parameters
-    const pathParams = (operation.parameters || []).filter(param => param.in === 'path');
+    const pathParams = (operation.parameters || []).filter(
+      (param) => param.in === "path"
+    );
     parameters.push(...pathParams);
 
     // Query parameters
-    const queryParams = (operation.parameters || []).filter(param => param.in === 'query');
+    const queryParams = (operation.parameters || []).filter(
+      (param) => param.in === "query"
+    );
     parameters.push(...queryParams);
 
     // Request body
     if (operation.requestBody) {
-      const contentType = operation.requestBody.content && 
-        (operation.requestBody.content['application/json'] || 
-         Object.values(operation.requestBody.content)[0]);
-      
+      const contentType =
+        operation.requestBody.content &&
+        (operation.requestBody.content["application/json"] ||
+          Object.values(operation.requestBody.content)[0]);
+
       if (contentType && contentType.schema) {
         parameters.push({
-          name: 'body',
-          in: 'body',
+          name: "body",
+          in: "body",
           schema: contentType.schema,
           required: operation.requestBody.required || false,
-          description: operation.requestBody.description || 'Request body'
+          description: operation.requestBody.description || "Request body",
         });
       }
     }
@@ -104,7 +121,7 @@ class OpenApi3Converter extends BaseOpenApiConverter {
     const format = paramSchema.format;
 
     switch (type) {
-      case 'string':
+      case "string":
         zodSchema = z.string();
         if (paramSchema.enum) {
           zodSchema = z.enum(paramSchema.enum);
@@ -118,19 +135,19 @@ class OpenApi3Converter extends BaseOpenApiConverter {
         if (paramSchema.maxLength !== undefined) {
           zodSchema = zodSchema.max(paramSchema.maxLength);
         }
-        if (format === 'date-time' || format === 'date') {
+        if (format === "date-time" || format === "date") {
           zodSchema = z.string().datetime();
         }
-        if (format === 'email') {
+        if (format === "email") {
           zodSchema = z.string().email();
         }
-        if (format === 'uri') {
+        if (format === "uri") {
           zodSchema = z.string().url();
         }
         break;
-      case 'number':
-      case 'integer':
-        zodSchema = type === 'integer' ? z.number().int() : z.number();
+      case "number":
+      case "integer":
+        zodSchema = type === "integer" ? z.number().int() : z.number();
         if (paramSchema.minimum !== undefined) {
           zodSchema = zodSchema.min(paramSchema.minimum);
         }
@@ -138,10 +155,10 @@ class OpenApi3Converter extends BaseOpenApiConverter {
           zodSchema = zodSchema.max(paramSchema.maximum);
         }
         break;
-      case 'boolean':
+      case "boolean":
         zodSchema = z.boolean();
         break;
-      case 'array':
+      case "array":
         if (paramSchema.items) {
           const itemSchema = this.convertParameterToZod(paramSchema.items);
           zodSchema = z.array(itemSchema);
@@ -155,14 +172,16 @@ class OpenApi3Converter extends BaseOpenApiConverter {
           zodSchema = z.array(z.any());
         }
         break;
-      case 'object':
+      case "object":
         if (paramSchema.properties) {
           const shape = {};
-          for (const [propName, propSchema] of Object.entries(paramSchema.properties)) {
+          for (const [propName, propSchema] of Object.entries(
+            paramSchema.properties
+          )) {
             shape[propName] = this.convertParameterToZod(propSchema);
           }
           zodSchema = z.object(shape);
-          
+
           // Handle required properties
           if (paramSchema.required && Array.isArray(paramSchema.required)) {
             const required = {};
@@ -231,24 +250,25 @@ class OpenApi3Converter extends BaseOpenApiConverter {
   convertSchemaToZod(schema) {
     // Handle references
     if (schema.$ref) {
-      const refPath = schema.$ref.replace('#/components/schemas/', '');
+      const refPath = schema.$ref.replace("#/components/schemas/", "");
       // Return a function that will be resolved later to avoid circular references
-      return () => this.convertSchemaToZod(this.schema.components.schemas[refPath]);
+      return () =>
+        this.convertSchemaToZod(this.schema.components.schemas[refPath]);
     }
 
     // Handle allOf, oneOf, anyOf
     if (schema.allOf) {
-      const schemas = schema.allOf.map(s => this.convertSchemaToZod(s));
+      const schemas = schema.allOf.map((s) => this.convertSchemaToZod(s));
       return z.intersection(...schemas);
     }
 
     if (schema.oneOf) {
-      const schemas = schema.oneOf.map(s => this.convertSchemaToZod(s));
+      const schemas = schema.oneOf.map((s) => this.convertSchemaToZod(s));
       return z.union(schemas);
     }
 
     if (schema.anyOf) {
-      const schemas = schema.anyOf.map(s => this.convertSchemaToZod(s));
+      const schemas = schema.anyOf.map((s) => this.convertSchemaToZod(s));
       return z.union(schemas);
     }
 

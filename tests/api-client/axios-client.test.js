@@ -178,4 +178,105 @@ describe('AxiosApiClient', () => {
       bodyParams: { limit: 10, name: 'Test User' }
     });
   });
+  
+  test('should unwrap body parameter for POST requests when wrapped', () => {
+    // Test case where the LLM wraps the body with another body
+    const wrappedParams = {
+      body: {
+        name: 'Test User',
+        status: 'active',
+        details: {
+          first_name: 'Test'
+        }
+      }
+    };
+    
+    // Test POST method with wrapped body
+    const postResult = client.processParameters(wrappedParams, '/api/person', 'post');
+    
+    // Should unwrap the body and use its contents directly
+    expect(postResult).toEqual({
+      pathParams: {},
+      queryParams: {},
+      bodyParams: {
+        name: 'Test User',
+        status: 'active',
+        details: {
+          first_name: 'Test'
+        }
+      }
+    });
+  });
+  
+  test('should unwrap body parameter for PUT requests when wrapped', () => {
+    // Test case where the LLM wraps the body with another body
+    const wrappedParams = {
+      body: {
+        name: 'Updated User',
+        status: 'inactive'
+      }
+    };
+    
+    // Test PUT method with wrapped body
+    const putResult = client.processParameters(wrappedParams, '/api/person/123', 'put');
+    
+    // Should unwrap the body and use its contents directly
+    expect(putResult).toEqual({
+      pathParams: {},
+      queryParams: {},
+      bodyParams: {
+        name: 'Updated User',
+        status: 'inactive'
+      }
+    });
+  });
+  
+  test('should not unwrap body parameter when it is not the only parameter', () => {
+    // Test case where there's a body parameter but also other parameters
+    const params = {
+      userId: '123',
+      body: {
+        name: 'Test User',
+        status: 'active'
+      }
+    };
+    
+    // Test POST method with body and other parameters
+    const postResult = client.processParameters(params, '/users/{userId}', 'post');
+    
+    // Should not unwrap the body since there are other parameters
+    expect(postResult).toEqual({
+      pathParams: { userId: '123' },
+      queryParams: {},
+      bodyParams: {
+        body: {
+          name: 'Test User',
+          status: 'active'
+        }
+      }
+    });
+  });
+  
+  test('should not unwrap body parameter for GET requests', () => {
+    // Test case where there's a body parameter in a GET request
+    const params = {
+      body: {
+        filter: 'active'
+      }
+    };
+    
+    // Test GET method with body parameter
+    const getResult = client.processParameters(params, '/users', 'get');
+    
+    // Should not unwrap the body for GET requests
+    expect(getResult).toEqual({
+      pathParams: {},
+      queryParams: {
+        body: {
+          filter: 'active'
+        }
+      },
+      bodyParams: {}
+    });
+  });
 });
