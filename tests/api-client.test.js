@@ -139,7 +139,7 @@ describe("API Client Integration", () => {
       );
 
       if (postToolIndex !== -1) {
-        const postToolCallback = server.tool.mock.calls[postToolIndex][2];
+        const postToolCallback = server.tool.mock.calls[postToolIndex][3];
 
         // Call the tool with body parameters
         await postToolCallback({

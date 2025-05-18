@@ -38,8 +38,6 @@ class OpenApi3Converter extends BaseOpenApiConverter {
         tools.push({
           name: toolName,
           description: toolDescription,
-          summary: operation.summary,
-          title: operation["x-title"] || operation.summary,
           parameters: zodSchema,
           method,
           path,

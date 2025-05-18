@@ -28,19 +28,13 @@ class McpToolGenerator {
 
     // Register each tool with the MCP server
     for (const tool of tools) {
-      const { name, description, parameters, method, path, summary, title } =
-        tool;
-
-      // Create tool annotations with title from OpenAPI
-      const annotations = {
-        title: title || summary || description,
-      };
+      const { name, description, parameters, method, path } = tool;
 
       // Register the tool with the MCP server
       server.tool(
         name,
+        description,
         parameters,
-        annotations,
         async (params) => {
           try {
             // Process parameters
