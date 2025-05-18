@@ -94,7 +94,7 @@ describe('AxiosApiClient Security Headers', () => {
     // Remove environment variables
     delete process.env.X_API_KEY;
     
-    // Create API client with security schemes
+    // Create API client with security schemes and disable strict security
     const apiClient = new AxiosApiClient({
       baseUrl: 'http://example.com',
       securitySchemes: {
@@ -103,7 +103,8 @@ describe('AxiosApiClient Security Headers', () => {
           in: 'header',
           name: 'X-API-Key'
         }
-      }
+      },
+      strictSecurity: false // Explicitly disable strict security for this test
     });
     
     // Make a request with security requirements
