@@ -6,11 +6,12 @@ const axios = require('axios');
 class AxiosApiClient {
   /**
    * Create a new API client
-   * @param {object} options - Client options
+   * @param {object} options - API client options
    * @param {string} options.baseUrl - Base URL for API requests
-   * @param {object} options.headers - Default headers for all requests
+   * @param {object} options.headers - Default headers for API requests
    * @param {number} options.timeout - Request timeout in milliseconds
    * @param {object} options.securitySchemes - Security schemes from OpenAPI schema
+   * @param {boolean} options.strictSecurity - Whether to throw an error when a required security token is missing
    */
   constructor(options = {}) {
     this.baseUrl = options.baseUrl || '';
@@ -21,6 +22,7 @@ class AxiosApiClient {
     };
     this.timeout = options.timeout || 30000;
     this.securitySchemes = options.securitySchemes || {};
+    this.strictSecurity = options.strictSecurity !== undefined ? options.strictSecurity : true;
   }
 
   /**
@@ -140,6 +142,7 @@ class AxiosApiClient {
    * Get security headers based on security requirements
    * @param {object} security - Security requirements for the request
    * @returns {object} Headers with security tokens
+   * @throws {Error} When strictSecurity is true and a required security token is missing
    */
   getSecurityHeaders(security = {}) {
     const headers = {};
@@ -181,6 +184,9 @@ class AxiosApiClient {
         // Add token to headers if available
         if (token) {
           headers[headerName] = token;
+        } else if (this.strictSecurity) {
+          // Throw an error when strictSecurity is true and a required security token is missing
+          throw new Error(`Required security token '${headerName}' (environment variable: ${envVarName}) is missing`);
         }
       }
     });

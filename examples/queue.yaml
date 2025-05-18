@@ -427,4 +427,4 @@ components:
     apiKeyAuth:
       type: apiKey
       in: header
-      name: Authorization
+      name: API_KEY
