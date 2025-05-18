@@ -58,6 +58,11 @@ Make sure to:
    - Enter URL: `http://localhost:3000/sse`
    - Press `Connect`
 
+4. Running Tests:
+   ```bash
+   npm test
+   ```
+
 
 ## License
 
