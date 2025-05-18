@@ -17,6 +17,7 @@ class McpToolGenerator {
    * @param {McpServer} server - MCP server instance
    * @param {Array<object>} tools - Array of tool definitions
    * @param {object} apiOptions - API client options
+   * @param {object} apiOptions.securitySchemes - Security schemes from OpenAPI schema
    */
   generateTools(server, tools, apiOptions = {}) {
     // Create API client
@@ -24,6 +25,7 @@ class McpToolGenerator {
       baseUrl: apiOptions.baseUrl || "",
       headers: apiOptions.headers || {},
       timeout: apiOptions.timeout || 30000,
+      securitySchemes: apiOptions.securitySchemes || {},
     });
 
     // Register each tool with the MCP server
@@ -48,6 +50,7 @@ class McpToolGenerator {
               pathParams,
               queryParams,
               bodyParams,
+              security: tool.security,
             });
 
             // Return the response data

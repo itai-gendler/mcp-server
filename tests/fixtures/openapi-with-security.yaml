@@ -1,0 +1,187 @@
+openapi: 3.0.0
+tags:
+  - name: Person
+    description: Operations about Person
+info:
+  version: 1.0.0
+  title: MCP Test API
+  description: Test API for MCP Server with Different Security Policies
+  contact:
+    name: MCP Team
+    url: https://example.com
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:4001
+    description: Test server
+
+# Global security policy - applies to all operations unless overridden
+security:
+  - apiKeyAuth: []
+
+paths:
+  /api/person/{idOrName}:
+    get:
+      summary: Get Person by ID or Name
+      tags:
+        - Person
+      parameters:
+        - name: idOrName
+          in: path
+          description: Object ID or name of the person
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Person response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "404":
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+      # Override global security for this operation - no security required for this endpoint
+      security: []
+  /api/person/search:
+    get:
+      summary: Search for Persons
+      tags:
+        - Person
+      parameters:
+        - name: q
+          in: query
+          description: Search query string
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Person pagination response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonPagination"
+      # Uses both API key and bearer token for security
+      security:
+        - apiKeyAuth: []
+        - bearerAuth: []
+  /api/person:
+    get:
+      summary: Get all Persons
+      tags:
+        - Person
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: number
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Person pagination response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonPagination"
+    post:
+      summary: Create a new Person
+      tags:
+        - Person
+      requestBody:
+        description: Person input request body
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonInput"
+      responses:
+        "200":
+          description: Person response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+      # Override global security for this operation - only cookie auth
+      security:
+        - cookieAuth: []
+
+components:
+  schemas:
+    NotFoundError:
+      description: Not found error
+      type: object
+      properties:
+        message:
+          type: string
+          example: Not found error
+        error:
+          type: string
+          example: Not found error
+        statusCode:
+          type: integer
+          example: 404
+      required:
+        - message
+        - error
+        - statusCode
+    Person:
+      description: Person object
+      type: object
+      properties:
+        id:
+          type: string
+          example: 5f9b3b3b9d9b4b0017f3b3b3
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john.doe@example.com
+      required:
+        - id
+        - name
+    PersonInput:
+      description: Person input object
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john.doe@example.com
+      required:
+        - name
+    PersonPagination:
+      description: Person Pagination object
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Person"
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    bearerAuth:
+      type: http
+      scheme: bearer

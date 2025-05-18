@@ -2,6 +2,7 @@ const { loadOpenApiFromFile, loadOpenApiFromUrl, loadOpenApiFromDirectory } = re
 const ConverterFactory = require('./converters/converter-factory');
 const McpToolGenerator = require('./mcp-tools/tool-generator');
 const SchemaUrlExtractor = require('./schema-loader/schema-url-extractor');
+const SecurityPolicyExtractor = require('./schema-loader/security-policy-extractor');
 const path = require('path');
 
 /**
@@ -132,6 +133,12 @@ class OpenApiToMcp {
             schemaApiOptions.baseUrl = baseUrl;
           }
         }
+        
+        // Extract security schemes from schema
+        const { securitySchemes } = SecurityPolicyExtractor.extractSecurityRequirements(schema);
+        if (securitySchemes && Object.keys(securitySchemes).length > 0) {
+          schemaApiOptions.securitySchemes = securitySchemes;
+        }
 
         // Convert schema to MCP tools
         const tools = converter.convertToMcpTools();
@@ -151,6 +158,12 @@ class OpenApiToMcp {
       if (baseUrl) {
         apiOptions.baseUrl = baseUrl;
       }
+    }
+    
+    // Extract security schemes from schema
+    const { securitySchemes } = SecurityPolicyExtractor.extractSecurityRequirements(this.schema);
+    if (securitySchemes && Object.keys(securitySchemes).length > 0) {
+      apiOptions.securitySchemes = securitySchemes;
     }
 
     // Convert schema to MCP tools

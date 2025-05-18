@@ -5,7 +5,7 @@ const SchemaUrlExtractor = require('../src/schema-loader/schema-url-extractor');
 
 describe('OpenApiToMcp', () => {
   let converter;
-  const openApiFilePath = path.resolve(__dirname, '../openapi.yaml');
+  const openApiFilePath = path.resolve(__dirname, './fixtures/openapi-single.yaml');
   const openApiDirPath = path.resolve(__dirname, './fixtures/openapi-dir');
 
   beforeEach(() => {

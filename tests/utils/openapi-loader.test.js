@@ -27,12 +27,12 @@ describe('OpenAPI Loader', () => {
 
   describe('loadOpenApiFromFile', () => {
     test('should load and validate OpenAPI YAML file', async () => {
-      const filePath = path.resolve(__dirname, '../../openapi.yaml');
+      const filePath = path.resolve(__dirname, '../fixtures/openapi-single.yaml');
       const schema = await loadOpenApiFromFile(filePath);
       
       expect(schema).toBeDefined();
       expect(schema.openapi).toBe('3.0.0');
-      expect(schema.info.title).toBe('Kastro API');
+      expect(schema.info.title).toBe('Test API');
     });
 
     test('should throw error for non-existent file', async () => {

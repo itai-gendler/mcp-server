@@ -9,7 +9,7 @@ jest.mock("axios");
 describe("API Client Integration", () => {
   let converter;
   let server;
-  const openApiFilePath = path.resolve(__dirname, "../openapi.yaml");
+  const openApiFilePath = path.resolve(__dirname, "./fixtures/openapi-single.yaml");
 
   beforeEach(() => {
     // Reset mocks

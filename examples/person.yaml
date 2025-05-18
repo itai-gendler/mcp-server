@@ -1,0 +1,432 @@
+openapi: 3.0.0
+tags:
+  - name: Person
+    description: Operations about Person
+info:
+  version: 1.0.0
+  title: MCP Example API
+  description: Example API for MCP Server
+  contact:
+    name: MCP Team
+    url: https://example.com
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:4000
+    description: Development server
+security:
+  - apiKeyAuth: [] # require authentication globally
+paths:
+  /api/person/:
+    get:
+      summary: Get all Persons
+      security: [] # disable specifically for a specific endpoint
+      tags:
+        - Person
+      responses:
+        "200":
+          $ref: "#/components/responses/PersonPaginationResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      summary: Create a new Person
+      tags:
+        - Person
+      requestBody:
+        $ref: "#/components/requestBodies/PersonInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/Person"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          $ref: "#/components/responses/DuplicationError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /api/person/{idOrName}:
+    get:
+      summary: Get Person by ID or Name
+      tags:
+        - Person
+      parameters:
+        - $ref: "#/components/parameters/idOrNameParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/Person"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    put:
+      summary: Update an Person
+      tags:
+        - Person
+      parameters:
+        - $ref: "#/components/parameters/idOrNameParam"
+      requestBody:
+        $ref: "#/components/requestBodies/PersonInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/Person"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    delete:
+      summary: Delete an Person
+      tags:
+        - Person
+      parameters:
+        - $ref: "#/components/parameters/idOrNameParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/Success"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+components:
+  schemas:
+    Pagination:
+      description: Pagination object
+      type: object
+      properties:
+        docs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Person"
+        total_docs:
+          type: integer
+          example: 100
+        limit:
+          type: integer
+          example: 10
+        total_pages:
+          type: integer
+          example: 10
+        page:
+          type: integer
+          example: 1
+        paging_counter:
+          type: integer
+          example: 1
+        has_prev_page:
+          type: boolean
+          example: false
+        has_next_page:
+          type: boolean
+          example: true
+        prev_page:
+          type: integer
+          nullable: true
+          example: 1
+        next_page:
+          type: integer
+          nullable: true
+          example: 3
+      required:
+        - docs
+        - total_docs
+        - limit
+        - total_pages
+        - page
+        - paging_counter
+        - has_prev_page
+        - has_next_page
+        - prev_page
+        - next_page
+    CommonError:
+      description: Common error object
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Error
+            status_code:
+              type: integer
+              example: 500
+            details:
+              type: object
+              additionalProperties:
+                type: string
+            object_name:
+              type: string
+              example: Item
+          required:
+            - message
+            - status_code
+      required:
+        - error
+    Success:
+      description: Success object
+      type: object
+      properties:
+        message:
+          type: string
+          example: Success
+    InternalServerError:
+      description: Internal server error object
+      allOf:
+        - $ref: "#/components/schemas/CommonError"
+        - properties:
+            error:
+              type: object
+              properties:
+                status_code:
+                  readOnly: true
+                  type: integer
+                  default: 500
+    ValidationError:
+      description: Validation error object
+      allOf:
+        - $ref: "#/components/schemas/CommonError"
+        - properties:
+            error:
+              type: object
+              properties:
+                status_code:
+                  readOnly: true
+                  type: integer
+                  default: 400
+              required:
+                - details
+    NotFoundError:
+      description: Not found error object
+      allOf:
+        - $ref: "#/components/schemas/CommonError"
+        - properties:
+            error:
+              type: object
+              properties:
+                status_code:
+                  readOnly: true
+                  type: integer
+                  default: 404
+              required:
+                - object_name
+    DuplicationError:
+      description: Duplication error object
+      allOf:
+        - $ref: "#/components/schemas/CommonError"
+        - properties:
+            error:
+              type: object
+              properties:
+                status_code:
+                  readOnly: true
+                  type: integer
+                  default: 409
+              required:
+                - object_name
+    Person:
+      description: Person object
+      type: object
+      properties:
+        created_at:
+          type: string
+          example: "2024-10-30T14:00:00.000Z"
+          format: date-time
+        updated_at:
+          type: string
+          example: "2024-10-30T14:00:00.000Z"
+          format: date-time
+        name:
+          type: string
+          example: Name
+        description:
+          type: string
+          example: Detailed description
+        details:
+          type: object
+          properties:
+            first_name:
+              type: string
+              example: John
+            last_name:
+              type: string
+              example: Doe
+            address:
+              type: object
+              properties:
+                city:
+                  type: string
+                  example: New York
+                zip:
+                  type: string
+                  example: "10001"
+        id:
+          type: string
+          example: 5f9b3b3b9d9b4b0017f3b3b3
+      required:
+        - created_at
+        - updated_at
+        - name
+        - details
+        - id
+    PersonInput:
+      description: Person input object
+      type: object
+      properties:
+        name:
+          type: string
+          example: Name
+        description:
+          type: string
+          example: Detailed description
+        details:
+          type: object
+          properties:
+            first_name:
+              type: string
+              example: John
+            address:
+              type: object
+              properties:
+                city:
+                  type: string
+                  example: New York
+                zip:
+                  type: string
+                  example: "10001"
+      required:
+        - name
+        - details
+    PersonPagination:
+      description: Person Pagination object
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - properties:
+            docs:
+              type: array
+              items:
+                $ref: "#/components/schemas/Person"
+  responses:
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InternalServerError"
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+    DuplicationError:
+      description: Duplication error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DuplicationError"
+    NotFoundError:
+      description: Not found error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotFoundError"
+    Success:
+      description: Success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Success"
+    Person:
+      description: Person response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Person"
+    PersonPaginationResponse:
+      description: Person pagination response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PersonPagination"
+  parameters:
+    idOrNameParam:
+      name: idOrName
+      in: path
+      description: Object ID or name of the object
+      required: true
+      schema:
+        type: string
+      examples:
+        id:
+          summary: Object ID
+          value: 5f9b3b3b9d9b4b0017f3b3b3
+        name:
+          summary: Name
+          value: Swagger
+    page:
+      in: query
+      name: page
+      description: Page number for pagination (number)
+      schema:
+        type: number
+        example: 10
+    limit:
+      in: query
+      name: limit
+      description: Number of items per page (number)
+      schema:
+        type: number
+        minimum: 1
+        maximum: 100
+        example: 20
+    filter:
+      in: query
+      name: filter
+      description: Filtering query (complex object)
+      allowReserved: true
+      schema:
+        type: string
+    sort:
+      in: query
+      name: sort
+      description: Sorting options
+      schema:
+        type: object
+        properties:
+          created_at:
+            type: number
+            enum:
+              - -1
+              - 1
+            example: -1
+          updated_at:
+            type: number
+            enum:
+              - -1
+              - 1
+            example: 1
+        example:
+          created_at: -1
+          updated_at: 1
+  requestBodies:
+    PersonInput:
+      description: Person input request body
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PersonInput"
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

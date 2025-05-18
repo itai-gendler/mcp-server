@@ -10,6 +10,7 @@ class AxiosApiClient {
    * @param {string} options.baseUrl - Base URL for API requests
    * @param {object} options.headers - Default headers for all requests
    * @param {number} options.timeout - Request timeout in milliseconds
+   * @param {object} options.securitySchemes - Security schemes from OpenAPI schema
    */
   constructor(options = {}) {
     this.baseUrl = options.baseUrl || '';
@@ -19,6 +20,7 @@ class AxiosApiClient {
       ...(options.headers || {})
     };
     this.timeout = options.timeout || 30000;
+    this.securitySchemes = options.securitySchemes || {};
   }
 
   /**
@@ -48,7 +50,10 @@ class AxiosApiClient {
       const axiosConfig = {
         method: method.toLowerCase(),
         url: fullUrl,
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          ...this.getSecurityHeaders(config.security)
+        },
         timeout: this.timeout
       };
       
@@ -129,6 +134,71 @@ class AxiosApiClient {
     });
     
     return { pathParams, queryParams, bodyParams };
+  }
+  
+  /**
+   * Get security headers based on security requirements
+   * @param {object} security - Security requirements for the request
+   * @returns {object} Headers with security tokens
+   */
+  getSecurityHeaders(security = {}) {
+    const headers = {};
+    
+    // If no security requirements or no security schemes, return empty headers
+    if (!security || !this.securitySchemes || Object.keys(this.securitySchemes).length === 0) {
+      return headers;
+    }
+    
+    // Only add security headers if security requirements are provided
+    // and they are in the expected format (array of objects)
+    if (!Array.isArray(security) || security.length === 0) {
+      return headers;
+    }
+    
+    // Get the list of required security schemes from the security requirements
+    const requiredSchemes = new Set();
+    security.forEach(requirement => {
+      Object.keys(requirement).forEach(schemeName => {
+        requiredSchemes.add(schemeName);
+      });
+    });
+    
+    // Process each security scheme
+    Object.entries(this.securitySchemes).forEach(([name, scheme]) => {
+      // Skip if this scheme is not required
+      if (!requiredSchemes.has(name)) {
+        return;
+      }
+      
+      // Currently only supporting apiKey type in header
+      if (scheme.type === 'apiKey' && scheme.in === 'header') {
+        const headerName = scheme.name;
+        const envVarName = this.getEnvVarName(headerName);
+        
+        // Get token from environment variable
+        const token = process.env[envVarName];
+        
+        // Add token to headers if available
+        if (token) {
+          headers[headerName] = token;
+        }
+      }
+    });
+    
+    return headers;
+  }
+  
+  /**
+   * Get environment variable name for a security token
+   * @param {string} headerName - Header name from security scheme
+   * @returns {string} Environment variable name
+   */
+  getEnvVarName(headerName) {
+    // Convert header name to environment variable format
+    // e.g., 'X-API-Key' becomes 'X_API_KEY'
+    return headerName
+      .replace(/[^a-zA-Z0-9]/g, '_')
+      .toUpperCase();
   }
 }
 

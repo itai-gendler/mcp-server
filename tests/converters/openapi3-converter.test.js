@@ -8,7 +8,7 @@ describe('OpenAPI 3.0 Converter', () => {
   let converter;
 
   beforeAll(async () => {
-    const filePath = path.resolve(__dirname, '../../openapi.yaml');
+    const filePath = path.resolve(__dirname, '../fixtures/openapi-single.yaml');
     schema = await loadOpenApiFromFile(filePath);
     converter = new OpenApi3Converter(schema);
   });
@@ -31,10 +31,10 @@ describe('OpenAPI 3.0 Converter', () => {
       expect(tool).toHaveProperty('path');
       
       // Verify a specific endpoint from our sample OpenAPI
-      const configGetTool = tools.find(t => t.path === '/api/config/activated' && t.method === 'get');
-      expect(configGetTool).toBeDefined();
-      expect(configGetTool.name).toBe('get_api_config_activated');
-      expect(configGetTool.description).toBe('Get the active Config configuration');
+      const getResourceTool = tools.find(t => t.path === '/api/resource' && t.method === 'get');
+      expect(getResourceTool).toBeDefined();
+      expect(getResourceTool.name).toBe('getResource');
+      expect(getResourceTool.description).toBe('Get Resource');
     });
   });
 
@@ -128,8 +128,9 @@ describe('OpenAPI 3.0 Converter', () => {
       expect(Object.keys(zodSchemas).length).toBeGreaterThan(0);
       
       // Check for specific schema from our sample OpenAPI
-      expect(zodSchemas).toHaveProperty('Config');
-      expect(zodSchemas).toHaveProperty('ConfigInput');
+      expect(zodSchemas).toHaveProperty('Resource');
+      // Check that the schema is a Zod schema
+      expect(zodSchemas.Resource instanceof z.ZodType).toBe(true);
     });
   });
 });

@@ -35,12 +35,16 @@ class OpenApi3Converter extends BaseOpenApiConverter {
         const parameters = this.extractParameters(operation, path);
         const zodSchema = this.convertParametersToZodSchema(parameters);
 
+        // Extract security requirements for this operation
+        const security = operation.security || this.schema.security || [];
+        
         tools.push({
           name: toolName,
           description: toolDescription,
           parameters: zodSchema,
           method,
           path,
+          security,
         });
       }
     }
