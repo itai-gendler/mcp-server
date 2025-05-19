@@ -67,7 +67,7 @@ paths:
           description: Bad request.
         "401":
           description: Unauthorized.
-  /v4/projects/{project_id}/issues:
+  /v4/projects/{project_id}/issue:
     post:
       summary: Create a new work item
       operationId: createWorkItem
@@ -111,6 +111,7 @@ paths:
                   error:
                     type: string
                     description: Error message.
+  /v4/projects/{project_id}/issues:
     get:
       summary: List work items of a project by creation time.
       operationId: listWorkItems
