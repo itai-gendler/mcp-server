@@ -1,0 +1,425 @@
+openapi: 3.0.0
+info:
+  title: Huawei Cloud ProjectMan API
+  version: 1.0.0
+  description: Full API specification for ProjectMan to manage projects, work items, and related entities on Huawei Cloud.
+servers:
+  - url: https://projectman-ext.ap-southeast-3.myhuaweicloud.com
+security:
+  - AuthToken: []
+paths:
+  /v4/projects:
+    get:
+      summary: List all projects
+      operationId: listProjects
+      parameters:
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            description: "Offset"
+            default: 0
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            description: "Limit"
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            description: "Fuzzy query of project names or descriptions. Advanced query such as wildcard characters is not supported."
+      responses:
+        "200":
+          description: A list of projects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized.
+  /v4/projects/{project_id}:
+    get:
+      summary: Get project details
+      operationId: getProject
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+      responses:
+        "200":
+          description: Project details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized.
+  /v4/projects/{project_id}/issues:
+    post:
+      summary: Create a new work item
+      operationId: createWorkItem
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkItemInput"
+      responses:
+        "201":
+          description: Work item created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItem"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+    get:
+      summary: List work items of a project by creation time.
+      operationId: listWorkItems
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: A list of work items.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized.
+  /v4/projects/{project_id}/issues/{issue_id}:
+    get:
+      summary: Get work item details
+      operationId: getWorkItem
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the project.
+        - name: issue_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The unique identifier of the work item.
+      responses:
+        "200":
+          description: Work item details.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized.
+components:
+  securitySchemes:
+    AuthToken:
+      type: apiKey
+      name: x-auth-token
+      in: header
+  schemas:
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the project.
+        name:
+          type: string
+          description: The name of the project.
+        description:
+          type: string
+          description: A detailed description of the project.
+        created_at:
+          type: string
+          format: date-time
+          description: The creation timestamp of the project.
+        updated_at:
+          type: string
+          format: date-time
+          description: The last update timestamp of the project.
+    WorkItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier of the work item.
+        title:
+          type: string
+          description: The title of the work item.
+        description:
+          type: string
+          description: A detailed description of the work item.
+        status:
+          type: string
+          description: The current status of the work item.
+        assignee:
+          type: string
+          description: The user assigned to the work item.
+        created_at:
+          type: string
+          format: date-time
+          description: The creation timestamp of the work item.
+        updated_at:
+          type: string
+          format: date-time
+          description: The last update timestamp of the work item.
+    WorkItemInput:
+      type: object
+      properties:
+        actual_work_hours:
+          type: integer
+          description: Indicates the actual personhours.
+        assigned_id:
+          type: integer
+          description: Handler ID, which corresponds to the numeric ID of the user information.
+        begin_time:
+          type: string
+          format: date
+          description: Start time, in the format of year-month-day.
+        description:
+          type: string
+          description: Description
+        developer_id:
+          type: integer
+          description: Developer ID, which corresponds to the numeric ID of user information.
+        domain_id:
+          type: integer
+          description: ID domain, 14'Performance',15'Function', 16'Reliability',17'Cyber security',18'Maintainability',19'Other DFX',20'Availability'
+        done_ratio:
+          type: integer
+          description: Work Item Progress Value
+        end_time:
+          type: string
+          format: date
+          description: End time, in the format of year-month-day.
+        expected_work_hours:
+          type: integer
+          description: Expected personhours.
+        iteration_id:
+          type: integer
+          description: sprint ID.
+        module_id:
+          type: integer
+          description: module ID.
+        name:
+          type: string
+          description: Title
+        parent_issue_id:
+          type: integer
+          description: ID of the parent work item. This parameter is mandatory when a child work item is created. The value of tracker_id of the parent work item cannot be 2 or 3.
+        priority_id:
+          type: integer
+          description: "Priority, 1: low, In 2, 3 high"
+        severity_id:
+          type: integer
+          description: "Importance, 10 key, 11 important, 12 general, 13 Prompt"
+        status_id:
+          type: integer
+          description: "Status ID, New 1, 2 in progress, 3 resolved, 4 in the test, 5 closed, 6 rejected"
+        tracker_id:
+          type: integer
+          description: "Work item type. The options are as follows: 2: task; 3: defect /Bug,5Epic,6Feature,7Story. The value 5 can only be the parent work item type of 6. 6 can only be the parent work item type of 7. The value 7 can only be the parent of 2 or 3."
+        new_custom_fields:
+          type: array
+          items:
+            type: object
+            properties:
+              custom_field:
+                type: string
+              field_name:
+                type: string
+              value:
+                type: string
+          description: "Custom Item"
+      required:
+        - tracker_id
+        - name
+        - priority_id
+    IssueUser:
+      type: object
+      properties:
+        user_id:
+          type: string
+        user_num_id:
+          type: integer
+        id:
+          type: integer
+        name:
+          type: string
+        nick_name:
+          type: string
+    CustomFeild:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Custom Attribute
+        value:
+          type: string
+          description: Value of a customized attribute.
+        new_name:
+          type: string
+          description: Custom Attribute
+    NewCustomField:
+      type: object
+      properties:
+        custom_field:
+          type: string
+          description: Custom Parameter
+        field_name:
+          type: string
+          description: Custom field name
+        value:
+          type: string
+          description: Value of a customized attribute. Use commas (,) to separate multiple values.
+    domain:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a domain.
+        name:
+          type: string
+          description: Name of a domain.
+    IssueProjectResponseV4:
+      type: object
+      properties:
+        project_id:
+          type: string
+          description: Project ID
+        project_name:
+          type: string
+          description: Project name
+        project_num_id:
+          type: integer
+          description: Project ID
+    iteration:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of an iteration.
+        name:
+          type: string
+          description: Name of an iteration.
+    module:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a module.
+        name:
+          type: string
+          description: Name of a module.
+    parent_issue:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a parent issue.
+        name:
+          type: string
+          description: Name of a parent issue.
+    priority:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a priority.
+        name:
+          type: string
+          description: Name of a priority.
+    severity:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a severity.
+        name:
+          type: string
+          description: Name of a severity.
+    status:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a status.
+        name:
+          type: string
+          description: Name of a status.
+    tracker:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identifier of a tracker.
+        name:
+          type: string
+          description: Name of a tracker.
