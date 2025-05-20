@@ -174,8 +174,8 @@ describe('AxiosApiClient', () => {
     const postResult = client.processParameters(params, '/users/{userId}', 'post');
     expect(postResult).toEqual({
       pathParams: { userId: '123' },
-      queryParams: {},
-      bodyParams: { limit: 10, name: 'Test User' }
+      queryParams: { limit: 10, name: 'Test User' },
+      bodyParams: {}
     });
   });
   
@@ -193,8 +193,7 @@ describe('AxiosApiClient', () => {
     
     // Test POST method with wrapped body
     const postResult = client.processParameters(wrappedParams, '/api/person', 'post');
-    
-    // Should unwrap the body and use its contents directly
+    // Should use the contents of body as bodyParams
     expect(postResult).toEqual({
       pathParams: {},
       queryParams: {},
@@ -219,8 +218,7 @@ describe('AxiosApiClient', () => {
     
     // Test PUT method with wrapped body
     const putResult = client.processParameters(wrappedParams, '/api/person/123', 'put');
-    
-    // Should unwrap the body and use its contents directly
+    // Should use the contents of body as bodyParams
     expect(putResult).toEqual({
       pathParams: {},
       queryParams: {},
@@ -244,15 +242,13 @@ describe('AxiosApiClient', () => {
     // Test POST method with body and other parameters
     const postResult = client.processParameters(params, '/users/{userId}', 'post');
     
-    // Should not unwrap the body since there are other parameters
+    // Should use the contents of body as bodyParams, other non-path keys are ignored
     expect(postResult).toEqual({
       pathParams: { userId: '123' },
       queryParams: {},
       bodyParams: {
-        body: {
-          name: 'Test User',
-          status: 'active'
-        }
+        name: 'Test User',
+        status: 'active'
       }
     });
   });
@@ -268,14 +264,10 @@ describe('AxiosApiClient', () => {
     // Test GET method with body parameter
     const getResult = client.processParameters(params, '/users', 'get');
     
-    // Should not unwrap the body for GET requests
+    // Should ignore 'body' param for GET requests
     expect(getResult).toEqual({
       pathParams: {},
-      queryParams: {
-        body: {
-          filter: 'active'
-        }
-      },
+      queryParams: {},
       bodyParams: {}
     });
   });

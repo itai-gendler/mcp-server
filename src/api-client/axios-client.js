@@ -106,35 +106,23 @@ class AxiosApiClient {
   processParameters(params, path, method) {
     const pathParams = {};
     const queryParams = {};
-    const bodyParams = {};
-    
-    // Handle the case where the LLM wraps the body with another body
-    // (e.g., { body: { actual: "payload" } } instead of just { actual: "payload" })
-    let processedParams = { ...params };
-    
-    // Check if there's a single 'body' parameter for POST/PUT/PATCH methods
-    if (['post', 'put', 'patch'].includes(method.toLowerCase()) && 
-        Object.keys(processedParams).length === 1 && 
-        processedParams.body && 
-        typeof processedParams.body === 'object') {
-      console.log('Detected wrapped body parameter, unwrapping it');
-      processedParams = processedParams.body;
-    }
-    
-    // Process parameters based on their location (path, query, body)
-    Object.entries(processedParams).forEach(([key, value]) => {
-      // Check if this is a path parameter
+    let bodyParams = {};
+    const isGetOrDelete = ['get', 'delete'].includes(method.toLowerCase());
+
+    Object.entries(params || {}).forEach(([key, value]) => {
       if (path.includes(`{${key}}`)) {
         pathParams[key] = value;
-      } else if (method.toLowerCase() === 'get' || method.toLowerCase() === 'delete') {
-        // For GET and DELETE requests, all non-path params go to query
-        queryParams[key] = value;
+      } else if (key === 'body') {
+        if (isGetOrDelete) {
+          // eslint-disable-next-line no-console
+          console.warn(`Warning: 'body' parameter provided for ${method.toUpperCase()} request; this will be ignored.`);
+        } else {
+          bodyParams = value || {};
+        }
       } else {
-        // For POST, PUT, PATCH, etc., non-path params go to body
-        bodyParams[key] = value;
+        queryParams[key] = value;
       }
     });
-    
     return { pathParams, queryParams, bodyParams };
   }
   
