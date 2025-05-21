@@ -1,76 +1,61 @@
-const path = require('path');
-const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
-const OpenApiToMcp = require('../../src/openapi-to-mcp');
-const StreamableHttpServer = require('../../src/server/streamable-http-server');
+const StreamableHttpServer = require("../../src/server/streamable-http-server");
 
-// Load OpenAPI schema and create a configured MCP server
-async function createConfiguredMcpServer() {
+/**
+ * Create a streamable HTTP server
+ * @param {object} options - Server options
+ * @param {object} options.server - Pre-configured MCP server instance
+ * @param {number} options.port - Port to listen on
+ * @param {string} options.host - Host to bind to
+ * @returns {Promise<object>} - The server instance
+ */
+async function createServer(options = {}) {
+  if (!options.server) {
+    throw new Error("A pre-configured server instance is required");
+  }
+
+  // Set defaults
+  const {
+    port = process.env.PORT || 3000,
+    host = process.env.HOST || "localhost",
+    server,
+  } = options;
+
+  // Create the HTTP server
+  const httpServer = new StreamableHttpServer({
+    port,
+    host,
+  });
+
+  // Create a factory function that will return the pre-configured server
+  const serverFactory = () => Promise.resolve(server);
+
+  // Set the MCP server factory
+  httpServer.setMcpServerFactory(serverFactory);
+
+  return httpServer;
+}
+
+/**
+ * Start the HTTP server with the given options
+ * @param {object} options - Server options
+ * @param {object} options.server - Pre-configured MCP server instance
+ * @returns {Promise<object>} - The server instance
+ */
+async function startServer(options = {}) {
   try {
-    // Create a new MCP server instance
-    const server = new McpServer({
-      name: "OpenAPI MCP Server",
-      version: "1.0.0",
-    });
-    
-    // Load OpenAPI schemas from directory
-    const openApiDirPath = path.resolve(__dirname, "../../openapi");
-    const converter = new OpenApiToMcp();
-    
-    // Configure API client options
-    const apiOptions = {
-      // You can override the base URL from the schema
-      // baseUrl: 'http://custom-api.example.com',
-      
-      // Set custom headers if needed
-      headers: {
-        // 'Authorization': 'Bearer YOUR_TOKEN_HERE',
-        // 'X-API-Key': 'YOUR_API_KEY_HERE',
-      },
-      
-      // Set request timeout (default is 30000ms)
-      timeout: 10000
-    };
-    
-    // Load schemas and register tools BEFORE returning the server
-    await converter.loadFromDirectory(openApiDirPath);
-    await converter.generateMcpServerTools(server, apiOptions);
-    
-    console.log("Successfully loaded OpenAPI schemas from directory and generated MCP tools");
-    
-    return server;
+    const httpServer = await createServer(options);
+
+    // Start the server
+    await httpServer.start();
+
+    return httpServer;
   } catch (error) {
-    console.error("Failed to configure MCP server:", error);
+    console.error("Error starting server:", error);
     throw error;
   }
 }
 
-// Start the HTTP server
-async function startServer() {
-  try {
-    // Create the HTTP server
-    const httpServer = new StreamableHttpServer({
-      port: process.env.PORT || 3000,
-      host: process.env.HOST || 'localhost'
-    });
-    
-    // Set the MCP server factory - this is now an async function that returns a fully configured server
-    httpServer.setMcpServerFactory(createConfiguredMcpServer);
-    
-    // Start the server
-    await httpServer.start();
-    
-    // Handle graceful shutdown
-    process.on('SIGINT', async () => {
-      console.log('Shutting down...');
-      await httpServer.stop();
-      process.exit(0);
-    });
-    
-  } catch (error) {
-    console.error('Error starting server:', error);
-    process.exit(1);
-  }
-}
-
-// Start the server
-startServer();
+// Export only what's needed for index.js
+module.exports = {
+  startServer,
+};

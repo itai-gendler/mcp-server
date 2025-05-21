@@ -4,10 +4,10 @@
   "description": "MCP server that converts OpenAPI schemas to MCP tools",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js stdio",
-    "start:stdio": "node index.js stdio",
-    "start:stream": "node index.js streamable",
-    "start:sse": "node index.js sse",
+    "start:cli:stdio": "node index.js stdio",
+    "start:cli:stream": "node index.js streamable",
+    "start:cli:sse": "node index.js sse",
+    "example:lib:basic": "node examples/lib/basic",
     "test": "jest",
     "test:watch": "jest --watch"
   },
