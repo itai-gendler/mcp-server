@@ -5,7 +5,7 @@ info:
   version: v1
   title: CloudPipeline
 servers:
-  - url: https://cloudpipeline-ext.ap-southeast-3.myhuaweicloud.com/
+  - url: https://cloudpipeline-ext.ap-southeast-3.myhuaweicloud.com
     description: Production server
 tags:
   - name: Template management
@@ -22,7 +22,7 @@ paths:
       x-request-examples-url-1: DELETE https://{endpoint}/v5/54f90b75fc1447b1b65e8d3a9f77923d/api/pipelines/e5460d1d403146a1935c2d4b68ef506c
       tags:
         - Pipeline Management (New)
-      description: 删除流水线
+      description: Delete pipeline
       operationId: DeletePipeline
       parameters:
         - $ref: '#/components/parameters/Path-Project-Id'
@@ -44,7 +44,7 @@ paths:
       x-request-examples-url-1: GET https://{endpoint}/v5/6428c2e2b4b64affa14ec80896695c49/api/pipelines/633839ac12a2465ba86dfc5cd212ee1a
       tags:
         - Pipeline Management (New)
-      description: 查询流水线详情
+      description: Query pipeline details
       operationId: QueryPipelineDetail
       parameters:
         - name: project_id
@@ -120,13 +120,6 @@ paths:
           description: Not Found
       x-order: 11
   /v5/{project_id}/api/pipelines:
-    parameters:
-      - name: project_id
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Project ID
     post:
       x-request-examples-url-1: POST https://{endpoint}/v5/d80a8a6530324b7bac972cbb8a9f28ec/api/pipelines
       x-request-examples-text-1:
@@ -155,13 +148,20 @@ paths:
       summary: Creating a pipeline
       description: Creating a pipeline
       operationId: CreatePipelineNew
+      parameters:
+      - name: project_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Project ID
       requestBody:
         required: true
         description: Creating a pipeline request body
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PipelineDTO'
+              $ref: '#/components/schemas/PipelineCreateDTO'
       responses:
         '200':
           description: Pipeline created successfully
@@ -180,19 +180,19 @@ paths:
         '404':
           description: Not Found
   /v5/{project_id}/api/pipelines/list:
-    parameters:
-      - name: project_id
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Project ID
     post:
       x-request-examples-url-1: POST https://{endpoint}/v5/54f90b75fc1447b1b65e8d3a9f77923d/api/pipelines/list
       tags:
         - Pipeline Management (New)
       description: List pipelines/Get project pipeline execution status
       operationId: ListPipelines
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID
       requestBody:
         required: false
         description: Query pipeline list request body
@@ -233,7 +233,7 @@ components:
   securitySchemes:
     AuthToken:
       type: apiKey
-      name: X-Auth-Token
+      name: x-auth-token
       in: header
       description: User authentication token required for API access
   schemas:
@@ -247,8 +247,8 @@ components:
           description: Pipeline ID
         name:
           type: string
-          example: 测试codecheck跳转链接
-          description: 流水线名称
+          example: test codecheck jump link
+          description: Pipeline name
         description:
           type: string
           example: ''
@@ -330,7 +330,7 @@ components:
           description: Pipeline group ID
         definition:
           type: string
-          example: '{\"stages\":[{\"name\":\"阶段_1\",\"sequence\":\"0\",\"jobs\":[{\"id\":\"\",\"stage_id\":1685432540395,\"identifier\":\"16854325403957a200aba-2d8f-412f-a2fb-7133696c7ec0\",\"name\":\"CodeCheck中文\",\"depends_on\":[],\"timeout\":\"\",\"timeout_unit\":\"\",\"steps\":[{\"name\":\"CodeCheck中文\",\"task\":\"official_devcloud_codeCheck\",\"sequence\":0,\"inputs\":[{\"key\":\"jobId\",\"value\":\"0042046363a04aa59dffd4b55005e85a\"},{\"key\":\"SYSTEM_METRICS_UNIQUE_KEY\",\"value\":\"/opt/devcloud/workspace\"}],\"business_type\":\"Gate\",\"runtime_attribution\":\"agent\",\"identifier\":\"168543254902152f7f88e-3ed5-487e-b397-5e3229b1d08d\",\"multi_step_editable\":0,\"official_task_version\":\"0.0.11\"}],\"exec_type\":\"OCTOPUS_JOB\",\"sequence\":0,\"pipeline_id\":\"633839ac12a2465ba86dfc5cd212ee1a\"}],\"identifier\":\"0\",\"pre\":[{\"task\":\"official_devcloud_autoTrigger\",\"sequence\":0}],\"post\":null,\"depends_on\":[],\"run_always\":false,\"pipeline_id\":\"633839ac12a2465ba86dfc5cd212ee1a\"}]}'
+          example: '{\"stages\":[{\"name\":\"Stage_1\",\"sequence\":\"0\",\"jobs\":[{\"id\":\"\",\"stage_id\":1685432540395,\"identifier\":\"16854325403957a200aba-2d8f-412f-a2fb-7133696c7ec0\",\"name\":\"CodeCheck中文\",\"depends_on\":[],\"timeout\":\"\",\"timeout_unit\":\"\",\"steps\":[{\"name\":\"CodeCheck中文\",\"task\":\"official_devcloud_codeCheck\",\"sequence\":0,\"inputs\":[{\"key\":\"jobId\",\"value\":\"0042046363a04aa59dffd4b55005e85a\"},{\"key\":\"SYSTEM_METRICS_UNIQUE_KEY\",\"value\":\"/opt/devcloud/workspace\"}],\"business_type\":\"Gate\",\"runtime_attribution\":\"agent\",\"identifier\":\"168543254902152f7f88e-3ed5-487e-b397-5e3229b1d08d\",\"multi_step_editable\":0,\"official_task_version\":\"0.0.11\"}],\"exec_type\":\"OCTOPUS_JOB\",\"sequence\":0,\"pipeline_id\":\"633839ac12a2465ba86dfc5cd212ee1a\"}],\"identifier\":\"0\",\"pre\":[{\"task\":\"official_devcloud_autoTrigger\",\"sequence\":0}],\"post\":null,\"depends_on\":[],\"run_always\":false,\"pipeline_id\":\"633839ac12a2465ba86dfc5cd212ee1a\"}]}'
           description: Pipeline definition
     customVariable:
       type: object
@@ -430,6 +430,26 @@ components:
               type: string
               example: ''
               description: Code repository alias
+    PipelineCreateDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Pipeline name
+        description:
+          type: string
+          description: Pipeline description
+        is_publish:
+          type: string
+          description: Whether it is a release pipeline
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeSource'
+          description: Pipeline source
+        definition:
+          type: string
+          description: Pipeline structure definition
     PipelineDTO:
       type: object
       properties:
@@ -466,7 +486,7 @@ components:
           type: string
           description: Pipeline structure definition version, new version defaults to 3.0
         definition:
-          type: string
+          $ref: '#/components/schemas/PipelineStages'
           description: Pipeline structure definition
         project_name:
           type: string
@@ -490,7 +510,40 @@ components:
       type: object
       properties:
         event:
+          $ref: '#/components/schemas/Trigger'
+    Trigger:
+      type: object
+      properties:
+        type:
           type: string
+          enum: [push, tag, merge_request, delete]
+          description: Type of the event
+        enabled:
+          type: boolean
+          default: true
+          description: Whether the trigger is enabled
+        branch_filter:
+          type: string
+          description: Branch filter pattern (e.g., 'main', 'feature/*')
+        tag_filter:
+          type: string
+          description: Tag filter pattern (e.g., 'v*')
+        events:
+          type: object
+          description: Detailed event type configuration
+          properties:
+            push:
+              type: boolean
+              description: Trigger on push events
+            tag_push:
+              type: boolean
+              description: Trigger on tag push events
+            merge_request:
+              type: boolean
+              description: Trigger on merge request events
+            delete:
+              type: boolean
+              description: Trigger on branch/tag delete events
     ListPipelineQuery:
       type: object
       description: List pipeline request body
@@ -821,3 +874,152 @@ components:
               example: ''
               description: Code repository alias
           description: Source parameters
+
+    PipelineStages:
+      type: object
+      properties:
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stage'
+
+    Stage:
+      type: object
+      properties:
+        name:
+          type: string
+        sequence:
+          type: string
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Job'
+        identifier:
+          type: string
+        pre:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+        post:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Step'
+        depends_on:
+          type: array
+          items:
+            type: string
+        run_always:
+          type: boolean
+        pipeline_id:
+          type: string
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        identifier_old:
+          type: string
+          nullable: true
+        stage_index:
+          type: integer
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        name:
+          type: string
+        async:
+          type: boolean
+          nullable: true
+        identifier:
+          type: string
+        sequence:
+          type: integer
+        condition:
+          type: string
+        strategy:
+          type: object
+          properties:
+            select_strategy:
+              type: string
+        timeout:
+          type: string
+        resource:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
+        stage_id:
+          type: string
+        pipeline_id:
+          type: string
+        unfinished_steps:
+          type: array
+          items:
+            type: string
+        condition_tag:
+          type: string
+        exec_type:
+          type: string
+        depends_on:
+          type: array
+          items:
+            type: string
+        reusable_job_id:
+          type: string
+          nullable: true
+
+    Step:
+      type: object
+      properties:
+        runtime_attribution:
+          type: string
+          nullable: true
+        multi_step_editable:
+          type: integer
+        official_task_version:
+          type: string
+          nullable: true
+        icon_url:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        task:
+          type: string
+        business_type:
+          type: string
+          nullable: true
+        inputs:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Input'
+        env:
+          type: array
+          items:
+            type: string
+        sequence:
+          type: integer
+        identifier:
+          type: string
+          nullable: true
+        endpoint_ids:
+          type: array
+          nullable: true
+          items:
+            type: string
+
+    Input:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
