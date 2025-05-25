@@ -1,0 +1,13 @@
+{
+  "name": "mcp-server-basic-example",
+  "version": "1.0.0",
+  "description": "Basic example of MCP Server with Kubernetes CRD support",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "zod": "^3.21.4"
+  }
+}

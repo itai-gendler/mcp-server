@@ -1,0 +1,99 @@
+description: |
+  When you need create a new pipeline and you useing with the mcp server - create a new pipeline tool, 
+  first, put in the "is_publish" : false.
+  and if the repo is codehub repo (the url contains 'codehub') put the global "type" : "code".
+  and add ssh repo url how you see in the json schema.
+  please take the ssh url by running git remote -v and taking the codeArts ssh url.
+  And for every stage the you when and you understand thet need create by the schema, for example build image, test , and etc all the steps that you understand you need have in the pipeline.
+  please do it fake, and put just ExecuteShellCommand job.
+  in the ExecuteShellCommand job, please put in the command the information about what is this step, for example  "Build Image".
+  in the ExecuteShellCommand  you need put in official_task_version
+  1.0.0 version
+
+  this is example json steps definision: 
+  {
+    "stages": [
+      {
+        "name": "Test Stage",
+        "sequence": "0",
+        "jobs": [
+          {
+            "id": "",
+            "identifier_old": null,
+            "stage_index": null,
+            "type": null,
+            "name": "ExecuteShellCommand",
+            "async": null,
+            "identifier": "JOB_ZTSEB",
+            "sequence": 0,
+            "condition": "{{ default() }}",
+            "strategy": {
+              "select_strategy": "selected"
+            },
+            "timeout": "",
+            "resource": "{\"type\":\"system\",\"arch\":\"x86\"}",
+            "steps": [
+              {
+                "runtime_attribution": "agent",
+                "multi_step_editable": 1,
+                "official_task_version": "0.0.2",
+                "icon_url": "",
+                "name": "Test Stage",
+                "task": "official_shell_plugin",
+                "business_type": "Normal",
+                "inputs": [
+                  {
+                    "key": "OFFICIAL_SHELL_SCRIPT_INPUT",
+                    "value": "echo \"Test Stage\""
+                  }
+                ],
+                "env": [],
+                "sequence": 0,
+                "identifier": "17481654546950d2b7a92-9fc7-4a8b-a75d-652bef6c728e",
+                "endpoint_ids": []
+              }
+            ],
+            "stage_id": "174816440285",
+            "pipeline_id": "48d6d766141a4cc89973caa1472249f9",
+            "unfinished_steps": [],
+            "condition_tag": "",
+            "exec_type": "OCTOPUS_JOB",
+            "depends_on": [],
+            "reusable_job_id": null
+          }
+        ],
+        "identifier": "174816440285cbec3959-c89d-4bc5-a1f6-cc2fb2f740b5",
+        "pre": [
+          {
+            "runtime_attribution": null,
+            "multi_step_editable": 0,
+            "official_task_version": null,
+            "icon_url": null,
+            "name": null,
+            "task": "official_devcloud_autoTrigger",
+            "business_type": null,
+            "inputs": null,
+            "env": null,
+            "sequence": 0,
+            "identifier": null,
+            "endpoint_ids": null
+          }
+        ],
+        "post": null,
+        "depends_on": [],
+        "run_always": false,
+        "pipeline_id": "48d6d766141a4cc89973caa1472249f9"
+      }
+    ]
+  }
+
+  but the parameter definision need be with string json format , its need contain json but in string parameter
+    ]
+  
+  
+  for the identifier that in the job please put job_{CRETAE_CODE}
+  for example : JOB_ZTSEB
+
+  for the identifier  that in the stage please put number like for example: 17481654546950d2b7a92-9fc7-4a8b-a75d-652bef6c728e
+
+  for the identifier that in the global definition please put number like this: 1748165440285cbec3959-c89d-4bc5-a1f6-cc2fb2f740b5
