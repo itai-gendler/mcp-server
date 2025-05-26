@@ -26,6 +26,7 @@ paths:
           schema:
             type: integer
             description: "Limit"
+            default: 10
         - name: search
           in: query
           required: false
@@ -112,7 +113,7 @@ paths:
                     type: string
                     description: Error message.
   /v4/projects/{project_id}/issues:
-    get:
+    post:
       summary: List work items of a project by creation time.
       operationId: listWorkItems
       parameters:
@@ -122,20 +123,21 @@ paths:
           schema:
             type: string
           description: The unique identifier of the project.
-        - name: offset
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 0
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            default: 10
-            minimum: 1
-            maximum: 100
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - offset
+                - limit
+              properties:
+                offset:
+                  type: integer
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
       responses:
         "200":
           description: A list of work items.
